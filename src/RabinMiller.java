@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RabinMiller {
 
@@ -15,10 +16,12 @@ public class RabinMiller {
     public static void main(String[] args) {
 
         // TEST FERMATA
-        if (args.length == 1 && args[0] == "-f") {
+        if (args.length == 1 && args[0].equals("-f")) {
             String wejscie = czytajPlik(WEJSCIE);
             List<BigInteger> lista = konwertujStringNaLiczby(wejscie);
             String wynik = testFermata(lista.get(0));
+
+            System.out.println(wynik);
             zapiszDoPliku(WYJSCIE, wynik);
 
             return;
@@ -28,24 +31,163 @@ public class RabinMiller {
         if (args.length == 0) {
             String wejscie = czytajPlik(WEJSCIE);
             List<BigInteger> lista = konwertujStringNaLiczby(wejscie);
+            String wynik = rabinMiller(lista);
+
+            System.out.println(wynik);
+            zapiszDoPliku(WYJSCIE, wynik);
 
             return;
         }
 
         // ERROR
-        System.out.println("Niewłaściwa komenda, dostępne wywołania:\n java RabinMiller -f\n java RabinMiller");
+        System.out.println("Niewlasciwa komenda, dostepne wywolania:\n java RabinMiller -f\n java RabinMiller");
     }
 
-    private static String testFermata(BigInteger bigInteger) {
-        // TODO
+    private static String testFermata(BigInteger liczba) {
+        BigInteger k = BigInteger.ZERO;
+        BigInteger b_before = BigInteger.ZERO;
+        BigInteger a = BigInteger.valueOf(randInt(2, liczba.subtract(BigInteger.ONE).intValue()));
+        BigInteger m = liczba.subtract(BigInteger.ONE);
+        BigInteger bj = a.modPow(m, liczba);
 
-        return "";
+        if (bj != BigInteger.ONE) {
+            return "prawdopodobnie zlozona";
+        }
+
+        return "brak pewnosci, dla a =" + a.toString();
     }
 
-    private static String rabinMiller(List<BigInteger> lista) {
-        // TODO
+    private static String rabinMiller(List<BigInteger> listaLiczb) {
+        if (listaLiczb.size() == 3) {
+            BigInteger liczba1 = listaLiczb.get(0);
+            BigInteger liczba3 = listaLiczb.get(2);
+            BigInteger liczba2 = (listaLiczb.get(1).multiply(liczba3)).subtract(BigInteger.ONE);
 
-        return "";
+            for (int i = 0; i < 40; i++) {
+                BigInteger k = BigInteger.ZERO;
+                BigInteger b_before = BigInteger.ZERO;
+                boolean pierwsza = true;
+                BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
+                if (a.gcd(liczba1) != BigInteger.ONE) {
+                    BigInteger ret = a.gcd(liczba1);
+                    return ret.toString() + "?" + i;
+                }
+                BigInteger m = liczba2;
+                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                    k = k.add(BigInteger.ONE);
+                    m = m.divide(BigInteger.valueOf(2));
+                }
+
+                BigInteger bj = a.modPow(m, liczba1);
+
+                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                    continue;
+                }
+
+                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                    BigInteger bj_before = bj;
+                    bj = bj_before.modPow(BigInteger.valueOf(2), liczba1);
+                    if (bj == BigInteger.ONE && pierwsza) {
+                        b_before = bj_before;
+                        pierwsza = false;
+                        break;
+                    }
+                }
+
+                BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
+                if (ret != BigInteger.ONE) {
+                    return ret.toString() + "?";
+                }
+            }
+            return "prawdopodobnie pierwsza";
+        } else if (listaLiczb.size() == 2) {
+            BigInteger liczba1 = listaLiczb.get(0);
+            BigInteger liczba2 = listaLiczb.get(1);
+
+            for (int i = 0; i < 40; i++) {
+                BigInteger k = BigInteger.ZERO;
+                BigInteger b_before = BigInteger.ZERO;
+                boolean pierwsza = true;
+                BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
+                if (a.gcd(liczba1) != BigInteger.ONE) {
+                    BigInteger ret = a.gcd(liczba1);
+                    return ret.toString();
+                }
+                BigInteger m = liczba2;
+                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                    k = k.add(BigInteger.ONE);
+                    m = m.divide(BigInteger.valueOf(2));
+                }
+                BigInteger bj = a.modPow(m, liczba1);
+                if (bj != BigInteger.ONE) {
+                    return "liczba r:" + liczba2.toString() + " nie jest wykladnikiem uniwersalnym: (" + a.toString() + "^" + liczba2.toString() + ") mod " + liczba1.toString() + " = " + bj.toString();
+                }
+                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                    continue;
+                }
+                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                    BigInteger bj_before = bj;
+                    bj = bj.modPow(BigInteger.valueOf(2), liczba1);
+                    if (bj == BigInteger.ONE && pierwsza) {
+                        b_before = bj_before;
+                        pierwsza = false;
+                        break;
+                    }
+                }
+
+                BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
+                if (ret != BigInteger.ONE) {
+                    return ret.toString();
+                }
+
+            }
+            return "prawdopodobnie pierwsza";
+        } else if (listaLiczb.size() == 1) {
+            BigInteger liczba1 = listaLiczb.get(0);
+
+            for (int i = 0; i < 40; i++) {
+                BigInteger k = BigInteger.ZERO;
+                BigInteger b_before = BigInteger.ZERO;
+                boolean pierwsza = true;
+                BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
+                if (a.gcd(liczba1) != BigInteger.ONE) {
+                    BigInteger ret = a.gcd(liczba1);
+                    return ret.toString();
+                }
+                BigInteger m = liczba1.subtract(BigInteger.ONE);
+                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                    k = k.add(BigInteger.ONE);
+                    m = m.divide(BigInteger.valueOf(2));
+                }
+                BigInteger bj = a.modPow(m, liczba1);
+                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                    continue;
+                }
+                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                    BigInteger bj_before = bj;
+                    bj = bj.modPow(BigInteger.valueOf(2), liczba1);
+                    if (bj == BigInteger.ONE && pierwsza) {
+                        b_before = bj_before;
+                        pierwsza = false;
+                        break;
+                    }
+                }
+
+                if (bj != BigInteger.ONE) {
+                    return "na pewno zlozona";
+                } else {
+                    if ((b_before.subtract(liczba1)) != BigInteger.ONE.negate()) {
+                        BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
+                        return ret.toString();
+                    }
+                }
+
+
+            }
+            return "prawdopodobnie pierwsza";
+        }
+
+        return "blad";
     }
 
     private static BigInteger najwiekszyWspolnyDzielnik(BigInteger a, BigInteger b) {
@@ -56,21 +198,43 @@ public class RabinMiller {
         }
     }
 
+    public static int randInt(int min, int max) {
+        Random rand = new Random();
+
+        int next = (max - min) + 1;
+
+        int randomNum = rand.nextInt(next > 0 ? next : 1) + min;
+
+        return randomNum;
+    }
+
     private static String czytajPlik(String nazwaPliku) {
         try {
             return new String(Files.readAllBytes(Paths.get(nazwaPliku))).trim();
         } catch (IOException e) {
-            throw new RuntimeException("Nie znaleziono pliku wejściowego!");
+            throw new RuntimeException("Nie znaleziono pliku wejsciowego!");
         }
     }
 
     private static List<BigInteger> konwertujStringNaLiczby(String string) {
+        String stringLiczby = "";
+
+        for (char znak : string.toCharArray()) {
+            if (Character.isDigit(znak)) {
+                stringLiczby += znak;
+            } else {
+                stringLiczby += " ";
+            }
+        }
+
         List<BigInteger> listaBigInt = new ArrayList<>();
         BigIntegerStringConverter bigIntegerStringConverter = new BigIntegerStringConverter();
 
-        for (String liczbaString : string.split("\n")) {
+        for (String liczbaString : stringLiczby.trim().replaceAll(" +", " ").split(" ")) {
             listaBigInt.add(bigIntegerStringConverter.fromString(liczbaString));
         }
+
+        //System.out.println(listaBigInt.toString());
 
         return listaBigInt;
     }
