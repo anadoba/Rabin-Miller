@@ -50,7 +50,7 @@ public class RabinMiller {
         BigInteger m = liczba.subtract(BigInteger.ONE);
         BigInteger bj = a.modPow(m, liczba);
 
-        if (bj != BigInteger.ONE) {
+        if (bj.compareTo(BigInteger.ONE) != 0) {
             return "prawdopodobnie zlozona";
         }
 
@@ -63,31 +63,33 @@ public class RabinMiller {
             BigInteger liczba3 = listaLiczb.get(2);
             BigInteger liczba2 = (listaLiczb.get(1).multiply(liczba3)).subtract(BigInteger.ONE);
 
+            boolean pierwsza;
+
             for (int i = 0; i < 40; i++) {
                 BigInteger k = BigInteger.ZERO;
                 BigInteger b_before = BigInteger.ZERO;
-                boolean pierwsza = true;
+                pierwsza = true;
                 BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
-                if (a.gcd(liczba1) != BigInteger.ONE) {
+                if (a.gcd(liczba1).compareTo(BigInteger.ONE) != 0) {
                     BigInteger ret = a.gcd(liczba1);
-                    return ret.toString() + "?" + i;
+                    return ret.toString();
                 }
                 BigInteger m = liczba2;
-                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                while (m.mod(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) != 0) {
                     k = k.add(BigInteger.ONE);
                     m = m.divide(BigInteger.valueOf(2));
                 }
 
                 BigInteger bj = a.modPow(m, liczba1);
 
-                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                if (bj.compareTo(BigInteger.ONE) == 0 || bj.compareTo(liczba1.subtract(BigInteger.ONE)) == 0) {
                     continue;
                 }
 
-                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                for (BigInteger j = BigInteger.ZERO; k.compareTo(j) > 0; j.add(BigInteger.ONE)) {
                     BigInteger bj_before = bj;
                     bj = bj_before.modPow(BigInteger.valueOf(2), liczba1);
-                    if (bj == BigInteger.ONE && pierwsza) {
+                    if (bj.compareTo(BigInteger.ONE) == 0 && pierwsza) {
                         b_before = bj_before;
                         pierwsza = false;
                         break;
@@ -95,8 +97,8 @@ public class RabinMiller {
                 }
 
                 BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
-                if (ret != BigInteger.ONE) {
-                    return ret.toString() + "?";
+                if (ret.compareTo(BigInteger.ONE) != 0) {
+                    return ret.toString();
                 }
             }
             return "prawdopodobnie pierwsza";
@@ -109,26 +111,26 @@ public class RabinMiller {
                 BigInteger b_before = BigInteger.ZERO;
                 boolean pierwsza = true;
                 BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
-                if (a.gcd(liczba1) != BigInteger.ONE) {
+                if (a.gcd(liczba1).compareTo(BigInteger.ONE) != 0) {
                     BigInteger ret = a.gcd(liczba1);
                     return ret.toString();
                 }
                 BigInteger m = liczba2;
-                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                while (m.mod(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) != 0) {
                     k = k.add(BigInteger.ONE);
                     m = m.divide(BigInteger.valueOf(2));
                 }
                 BigInteger bj = a.modPow(m, liczba1);
-                if (bj != BigInteger.ONE) {
+                if (bj.compareTo(BigInteger.ONE) != 0) {
                     return "liczba r:" + liczba2.toString() + " nie jest wykladnikiem uniwersalnym: (" + a.toString() + "^" + liczba2.toString() + ") mod " + liczba1.toString() + " = " + bj.toString();
                 }
-                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                if (bj.compareTo(BigInteger.ONE) == 0 || bj.compareTo(liczba1.subtract(BigInteger.ONE)) == 0) {
                     continue;
                 }
-                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                for (BigInteger j = BigInteger.ZERO; k.compareTo(j) > 0; j.add(BigInteger.ONE)) {
                     BigInteger bj_before = bj;
                     bj = bj.modPow(BigInteger.valueOf(2), liczba1);
-                    if (bj == BigInteger.ONE && pierwsza) {
+                    if (bj.compareTo(BigInteger.ONE) == 0 && pierwsza) {
                         b_before = bj_before;
                         pierwsza = false;
                         break;
@@ -136,7 +138,7 @@ public class RabinMiller {
                 }
 
                 BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
-                if (ret != BigInteger.ONE) {
+                if (ret.compareTo(BigInteger.ONE) != 0) {
                     return ret.toString();
                 }
 
@@ -150,33 +152,33 @@ public class RabinMiller {
                 BigInteger b_before = BigInteger.ZERO;
                 boolean pierwsza = true;
                 BigInteger a = BigInteger.valueOf(randInt(2, liczba1.subtract(BigInteger.ONE).intValue()));
-                if (a.gcd(liczba1) != BigInteger.ONE) {
+                if (a.gcd(liczba1).compareTo(BigInteger.ONE) != 0) {
                     BigInteger ret = a.gcd(liczba1);
                     return ret.toString();
                 }
                 BigInteger m = liczba1.subtract(BigInteger.ONE);
-                while (m.mod(BigInteger.valueOf(2)) != BigInteger.ONE) {
+                while (m.mod(BigInteger.valueOf(2)).compareTo(BigInteger.ONE) != 0) {
                     k = k.add(BigInteger.ONE);
                     m = m.divide(BigInteger.valueOf(2));
                 }
                 BigInteger bj = a.modPow(m, liczba1);
-                if (bj == BigInteger.ONE || bj == liczba1.subtract(BigInteger.ONE)) {
+                if (bj.compareTo(BigInteger.ONE) == 0 || bj.compareTo(liczba1.subtract(BigInteger.ONE)) == 0) {
                     continue;
                 }
-                for (BigInteger j = BigInteger.ZERO; j.compareTo(k) > 0; j.add(BigInteger.ONE)) {
+                for (BigInteger j = BigInteger.ZERO; k.compareTo(j) > 0; j.add(BigInteger.ONE)) {
                     BigInteger bj_before = bj;
                     bj = bj.modPow(BigInteger.valueOf(2), liczba1);
-                    if (bj == BigInteger.ONE && pierwsza) {
+                    if (bj.compareTo(BigInteger.ONE) == 0 && pierwsza) {
                         b_before = bj_before;
                         pierwsza = false;
                         break;
                     }
                 }
 
-                if (bj != BigInteger.ONE) {
+                if (bj.compareTo(BigInteger.ONE) != 0) {
                     return "na pewno zlozona";
                 } else {
-                    if ((b_before.subtract(liczba1)) != BigInteger.ONE.negate()) {
+                    if ((b_before.subtract(liczba1)).compareTo(BigInteger.ONE.negate()) != 0) {
                         BigInteger ret = (b_before.subtract(BigInteger.ONE)).gcd(liczba1);
                         return ret.toString();
                     }
@@ -188,14 +190,6 @@ public class RabinMiller {
         }
 
         return "blad";
-    }
-
-    private static BigInteger najwiekszyWspolnyDzielnik(BigInteger a, BigInteger b) {
-        if (b == BigInteger.ZERO) {
-            return a;
-        } else {
-            return najwiekszyWspolnyDzielnik(b, a.mod(b));
-        }
     }
 
     public static int randInt(int min, int max) {
@@ -233,8 +227,6 @@ public class RabinMiller {
         for (String liczbaString : stringLiczby.trim().replaceAll(" +", " ").split(" ")) {
             listaBigInt.add(bigIntegerStringConverter.fromString(liczbaString));
         }
-
-        //System.out.println(listaBigInt.toString());
 
         return listaBigInt;
     }
